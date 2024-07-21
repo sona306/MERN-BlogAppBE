@@ -11,7 +11,37 @@ app.use(cors())
 
 mongoose.connect("mongodb+srv://sonasabu:sonavi306@cluster0.ejzjjq6.mongodb.net/mernblogappdb?retryWrites=true&w=majority&appName=Cluster0")
 
+//signin
+app.post("/signin",async(req,res)=>{
+    let input = req.body
+    let result = userModel.find({email:req.body.email}).then(
+        (items)=>{
+            if (items.length>0) {
+                const passwordValidator = bcrypt.compareSync(req.body.password,items[0].password)
+                if (passwordValidator) {
+                    
+                    jsonwebtoken.sign({email:req.body.email},"blogApp",{expiresIn:"1d"},
+                        (error,token)=>{
+                            if (error) {
+                                res.json({"status":"Error","errorMessage":error})
+                            } else {
+                                res.json({"status":"Success","token":token,"userId":items[0]._id})
+                            }
+                    })
 
+                } else {
+                    res.json({"status":"Incorrect Password"})
+                }
+            } else {
+                res.json({"status":"Invalid Email Id"})
+            }
+        }
+    ).catch()
+})
+
+
+
+//signup
 app.post("/signup", async (req, res) => {
 
     let input = req.body
