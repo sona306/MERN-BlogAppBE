@@ -27,6 +27,50 @@ app.post("/create",async(req,res)=>{
     })
 })
 
+//view all post
+app.post("/viewall",(req,res)=>{
+    let token = req.headers.token
+    jsonwebtoken.verify(token,"blogApp",(error,decoded)=>{
+    if (decoded && decoded.email) {
+        postModel.find().then(
+            (items)=>{
+                res.json(items)
+            }
+        ).catch(
+            (error)=>{
+                res.json({"status":"Error"})
+            }
+        )
+    } else {
+        res.json({"status":"Invalid Authentication"})
+    }
+    })
+    
+})
+
+//view Mypost
+app.post("/viewmypost",(req,res)=>{
+    let input = req.body
+    let token = req.headers.token
+    jsonwebtoken.verify(token,"blogApp",(error,decoded)=>{
+    if (decoded && decoded.email) {
+        postModel.find(input).then(
+            (items)=>{
+                res.json(items)
+            }
+        ).catch(
+            (error)=>{
+                res.json({"status":"Error"})
+            }
+        )
+    } else {
+        res.json({"status":"Invalid Authentication"})
+    }
+    })
+    
+})
+
+
 //signin
 app.post("/signin",async(req,res)=>{
     let input = req.body
